@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: Ai-Service
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://postgres_bd_connect:5432/connects
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+gemini:
+  apiKey: "AIzaSyDtYiQCaSH3zmE3EK2H5tmuuWrACY30TsI"
+server:
+  port: 2222
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:9283/eureka

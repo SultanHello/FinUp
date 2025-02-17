@@ -23,4 +23,8 @@ public class User {
     private String username;
     private Role role;
     private boolean notification;
+    private String name;
+    private String surname;
+    private String location;
+
 }

@@ -47,9 +47,13 @@ public class JwtService {
         Claims claims =extractAllClaims(token);
         return  reselver.apply(claims);
     }
-    public  boolean isValid(String token, UserDetails user){
-        String idNumber =extractId(token);
-        return idNumber.equals(user.getUsername())&&!isValidExtract(token);
+    public boolean isValid(String token, UserDetails user) {
+        String idNumber = extractId(token);
+        return idNumber.equals(user.getUsername()) && isValidExtract(token);
+    }
+
+    public boolean isValid(String token) {
+        return isValidExtract(token);
     }
 
     private boolean isValidExtract(String token) {

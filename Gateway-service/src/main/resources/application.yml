@@ -1,0 +1,42 @@
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+
+  cloud:
+    gateway:
+      routes:
+#        - id: ReleaseGitService
+#          uri: http://release-git-service-svc.default.svc.cluster.local:8080
+#          predicates:
+#            - Path=/releases/**
+#          filters:
+#            - AuthenticationFilter
+#
+#        - id: NotificationSenderGitService
+#          uri: http://notification-git-service-svc.default.svc.cluster.local:8082
+#          predicates:
+#            - Path=/notification/**
+#
+#        - id: ApplicationGitService
+#          uri: http://application-git-service-svc.default.svc.cluster.local:8084
+#          predicates:
+#            - Path=/app/**
+#          filters:
+#            - AuthenticationFilter
+#
+#
+#        - id: UserGitService
+#          uri: http://localhost:8081
+#          predicates:
+#            - Path=/users/**
+#  #          filters:
+#  #            - AuthenticationFilter
+  application:
+    name: Gateway-service
+server:
+  port: 8085
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:9283/eureka

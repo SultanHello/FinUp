@@ -29,6 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
         if(authHeader==null||!authHeader.startsWith("Bearer ")){
             filterChain.doFilter(request,response);
+            return;
         }
         String token =authHeader.substring(7);
         String idNumber =jwtService.extractId(token);
@@ -44,6 +45,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request,response);
-
     }
 }

@@ -1,4 +1,75 @@
 services:
+  gateway-service:
+    environment:
+      eureka.client.serviceUrl.defaultZone: http://host.docker.internal:9283/eureka/
+    build:
+      context: ./Gateway-service
+      dockerfile: Dockerfile
+    ports:
+      - "5743:8085"
+    depends_on:
+      - eureka-service
+
+  transaction-service:
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_KAFKA_CONSUMER_GROUP_ID: ai-service-group
+      eureka.client.serviceUrl.defaultZone: http://host.docker.internal:9283/eureka/
+      SPRING_DATASOURCE_URL1: jdbc:postgresql://postgres_bd_transactions:5434/transactions
+      SPRING_DATASOURCE_USERNAME1: postgres
+      SPRING_DATASOURCE_PASSWORD1: postgres
+    build:
+      context: ./Transaction-Service
+      dockerfile: Dockerfile
+    ports:
+      - "1111:1111"
+    depends_on:
+      - eureka-service
+
+  ai-service:
+    environment:
+
+      eureka.client.serviceUrl.defaultZone: http://host.docker.internal:9283/eureka/
+      SPRING_DATASOURCE_URL1: jdbc:postgresql://postgres_bd_connect:5435/connects
+      SPRING_DATASOURCE_USERNAME1: postgres
+      SPRING_DATASOURCE_PASSWORD1: postgres
+    build:
+      context: ./Ai-Service
+      dockerfile: Dockerfile
+    ports:
+      - "2222:2222"
+    depends_on:
+      - eureka-service
+
+
+  eureka-service:
+    build:
+      context: ./Eureka-service
+      dockerfile: Dockerfile
+    ports:
+      - "9283:9283"
+    environment:
+      eureka.client.register-with-eureka: false  # Это сервер, он не регистрируется сам в себе
+      eureka.client.fetch-registry: false
+
+  user-service:
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_KAFKA_CONSUMER_GROUP_ID: user-service-group
+      SPRING_DATASOURCE_URL1: jdbc:postgresql://postgres_bd:5432/users
+      SPRING_DATASOURCE_USERNAME1: postgres
+      SPRING_DATASOURCE_PASSWORD1: postgres
+
+      eureka.client.serviceUrl.defaultZone: http://host.docker.internal:9283/eureka/
+    build:
+      context: ./User-Service
+      dockerfile: Dockerfile
+    ports:
+      - "9834:8080"
+    depends_on:
+      - kafka
+      - eureka-service
+
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     ports:
@@ -6,6 +77,21 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+
+  auth-service:
+    environment:
+      SPRING_DATASOURCE_URL1: jdbc:postgresql://postgres_bd_auth:5433/userSecrets
+      SPRING_DATASOURCE_USERNAME1: postgres
+      SPRING_DATASOURCE_PASSWORD1: postgres
+      eureka.client.serviceUrl.defaultZone: http://host.docker.internal:9283/eureka/
+    build:
+      context: ./Auth-Service
+      dockerfile: Dockerfile
+    ports:
+      - "9835:8021"
+    depends_on:
+      - eureka-service
+
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -20,4 +106,43 @@ services:
     depends_on:
       - zookeeper
 
+  postgres_bd_auth:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=userSecrets'
+      - 'POSTGRES_PASSWORD=postgres'
+      - 'POSTGRES_USER=postgres'
+    ports:
+      - '5433:5432'
 
+  postgres_bd_connect:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=connects'
+      - 'POSTGRES_PASSWORD=postgres'
+      - 'POSTGRES_USER=postgres'
+    ports:
+      - '5435:5432'
+
+
+  postgres_bd_transactions:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=transactions'
+      - 'POSTGRES_PASSWORD=postgres'
+      - 'POSTGRES_USER=postgres'
+    ports:
+      - '5434:5432'
+
+  postgres_bd:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=users'
+      - 'POSTGRES_PASSWORD=postgres'
+      - 'POSTGRES_USER=postgres'
+    ports:
+      - '5432:5432'
+
+
+networks:
+  crud-network:
