@@ -1,27 +1,23 @@
 package org.example.userservice.service;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.example.userservice.client.AuthClient;
+import org.example.userservice.client.BudgetClient;
+import org.example.userservice.dto.ReportDTO;
 import org.example.userservice.model.Role;
-import org.example.userservice.model.TransactionDTO;
+import org.example.userservice.dto.TransactionDTO;
 import org.example.userservice.model.User;
 import org.example.userservice.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -29,8 +25,12 @@ import java.util.Map;
 public class UserService {
     private final UserRepository userRepository ;
 
+    private final AuthClient authClient;
+
 
     private final KafkaTemplate<String, Map<String,String>> kafkaTemplate1;
+
+    private final BudgetClient budgetClient;
     Map<String ,String> map;
     @KafkaListener(topics = "profileInfo", groupId = "my-group4")
     public void listenToObjectMessage(Map<String,String> map) {
@@ -49,13 +49,21 @@ public class UserService {
     }
 
     public User getUserProfile(String token) {
-        String username = getUsernameFromAuthService(token);
+        String username = authClient.getUsernameFromAuthService(token);
         System.out.println("dvsdvsdv :"+username);
         return userRepository.findByUsername(username);
     }
+    private Long getUserId(String token){
+        String username = authClient.getUsernameFromAuthService(token);
+        User user = userRepository.findByUsername(username);
+        return user.getId();
+
+
+    }
+
 
     public String updateUserProfile(String token, User user) {
-        String username = getUsernameFromAuthService(token);
+        String username = authClient.getUsernameFromAuthService(token);
         User userOld = userRepository.findByUsername(username);
         userOld.setName(user.getName());
         userOld.setUsername(user.getUsername());
@@ -68,20 +76,7 @@ public class UserService {
 
     }
 
-    private String getUsernameFromAuthService(String token){
-        RestTemplate restTemplate = new RestTemplate();
-        org.springframework.http.HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", token);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<String> response = restTemplate.exchange(
-                "http://auth-service:8021/auth/getUsername",
-                HttpMethod.GET,
-                entity,
-                String.class
-        );
-        return response.getBody();
-    }
     public List<User> getUsers() {
         return userRepository.findAll();
     }
@@ -91,7 +86,8 @@ public class UserService {
         System.out.println(123423);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedDate = LocalDateTime.now().format(formatter);
-        User user = userRepository.findByUsername(getUsernameFromAuthService(token));
+
+        User user = userRepository.findByUsername(authClient.getUsernameFromAuthService(token));
         Map<String, String> transaction = Map.of(
                 "amount", String.valueOf(transactionDTO.getAmount()),
                 "description", transactionDTO.getDescription(),
@@ -107,6 +103,28 @@ public class UserService {
     private String getToken(String authHeader){
         return authHeader.replace("Bearer ", "");
 
+    }
+
+    public List<Long> getIds() {
+        return userRepository.findAll().stream()
+                .map(User::getId)
+                .collect(Collectors.toList());
+    }
+
+    public List<ReportDTO> getReport(String token) {
+        Long userId = getUserId(token);
+        return budgetClient.getReports(userId);
+
+    }
+
+    public ReportDTO getReportLast(String token) {
+        Long userId = getUserId(token);
+
+        return budgetClient.getReportLast(userId);
+    }
+
+    public User getUserProfileById(Long id) {
+        return null;
     }
 
 

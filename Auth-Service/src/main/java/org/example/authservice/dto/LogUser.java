@@ -1,4 +1,4 @@
-package org.example.authservice.model;
+package org.example.authservice.dto;
 
 
 import lombok.Data;

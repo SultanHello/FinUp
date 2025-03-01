@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jdk.jfr.Category;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "transactions")
 @Getter
@@ -29,5 +31,5 @@ public class Transaction {
     private Long userId;
 
     @Column(nullable = false)
-    private String date;
+    private LocalDate date;
 }

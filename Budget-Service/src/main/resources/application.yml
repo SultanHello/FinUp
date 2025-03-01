@@ -1,13 +1,14 @@
 spring:
+  application:
+    name: Budget-Service
+
   kafka:
     bootstrap-servers: localhost:9092
-    consumer:
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      auto-offset-reset: earliest
-      enable-auto-commit: false
-  application:
-    name: Transaction-Service
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      retries: 3
+      acks: all
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://postgres_bd_expenses:5432/expenses
@@ -20,11 +21,11 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
+server:
+  port: 3333
 
 
 eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:9283/eureka
-server:
-  port: 1111

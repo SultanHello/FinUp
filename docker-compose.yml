@@ -13,9 +13,9 @@ services:
   transaction-service:
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      SPRING_KAFKA_CONSUMER_GROUP_ID: ai-service-group
+      SPRING_KAFKA_CONSUMER_GROUP_ID: transaction-service-group
       eureka.client.serviceUrl.defaultZone: http://host.docker.internal:9283/eureka/
-      SPRING_DATASOURCE_URL1: jdbc:postgresql://postgres_bd_transactions:5434/transactions
+      SPRING_DATASOURCE_URL1: jdbc:postgresql://postgres_bd_expenses:5434/expenses
       SPRING_DATASOURCE_USERNAME1: postgres
       SPRING_DATASOURCE_PASSWORD1: postgres
     build:
@@ -26,9 +26,38 @@ services:
     depends_on:
       - eureka-service
 
+  budget-service:
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_KAFKA_CONSUMER_GROUP_ID: budget-service-group
+      eureka.client.serviceUrl.defaultZone: http://host.docker.internal:9283/eureka/
+      SPRING_DATASOURCE_URL1: jdbc:postgresql://postgres_bd_expenses:5434/expenses
+      SPRING_DATASOURCE_USERNAME1: postgres
+      SPRING_DATASOURCE_PASSWORD1: postgres
+    build:
+      context: ./Budget-Service
+      dockerfile: Dockerfile
+    ports:
+      - "3333:3333"
+    depends_on:
+      - eureka-service
+      - kafka
+
+  notification-service:
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_KAFKA_CONSUMER_GROUP_ID: notification-service-group
+      eureka.client.serviceUrl.defaultZone: http://host.docker.internal:9283/eureka/
+    build:
+      context: ./Notification-Service
+      dockerfile: Dockerfile
+    ports:
+      - "4444:4444"
+    depends_on:
+      - eureka-service
+
   ai-service:
     environment:
-
       eureka.client.serviceUrl.defaultZone: http://host.docker.internal:9283/eureka/
       SPRING_DATASOURCE_URL1: jdbc:postgresql://postgres_bd_connect:5435/connects
       SPRING_DATASOURCE_USERNAME1: postgres
@@ -125,10 +154,10 @@ services:
       - '5435:5432'
 
 
-  postgres_bd_transactions:
+  postgres_bd_expenses:
     image: 'postgres:latest'
     environment:
-      - 'POSTGRES_DB=transactions'
+      - 'POSTGRES_DB=expenses'
       - 'POSTGRES_PASSWORD=postgres'
       - 'POSTGRES_USER=postgres'
     ports:

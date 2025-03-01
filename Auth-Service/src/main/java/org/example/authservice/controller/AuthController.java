@@ -2,8 +2,8 @@ package org.example.authservice.controller;
 
 
 import lombok.AllArgsConstructor;
-import org.example.authservice.model.LogUser;
-import org.example.authservice.model.RegUser;
+import org.example.authservice.dto.LogUser;
+import org.example.authservice.dto.RegUser;
 import org.example.authservice.model.User;
 import org.example.authservice.service.AuthService;
 import org.springframework.http.HttpStatus;
@@ -41,9 +41,8 @@ public class AuthController {
         return ResponseEntity.ok(userInfo);
     }
 
-    @GetMapping("/getUsername")
+    @GetMapping("/username")
     public ResponseEntity<String> getUsername(@RequestHeader(value = "Authorization") String authHeader){
-
 
         if (authHeader == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -51,6 +50,12 @@ public class AuthController {
         String token = authHeader.replace("Bearer ", "");
 
         String username= authService.getUsername(token);
+        return ResponseEntity.ok(username);
+    }
+    @GetMapping("/username/{id}")
+    public ResponseEntity<String> getUsernameById(@PathVariable Long id){
+        String username= authService.getUsernameById(id);
+        System.out.println(username);
         return ResponseEntity.ok(username);
     }
 

@@ -2,19 +2,16 @@ package org.example.authservice.service;
 
 
 import lombok.AllArgsConstructor;
-import org.example.authservice.filter.JwtAuthenticationFilter;
-import org.example.authservice.model.LogUser;
-import org.example.authservice.model.RegUser;
+import org.example.authservice.dto.LogUser;
+import org.example.authservice.dto.RegUser;
 import org.example.authservice.model.User;
 import org.example.authservice.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -80,5 +77,9 @@ public class AuthService {
             e.printStackTrace(); // Выведет полный стек ошибки
             throw new RuntimeException("Error with JWT: " + e.getMessage(), e);
         }
+    }
+
+    public String getUsernameById(Long id) {
+        return userRepository.findById(id).get().getUsername();
     }
 }

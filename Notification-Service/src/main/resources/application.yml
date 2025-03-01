@@ -1,0 +1,34 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      group-id: my-group6  # Указан ваш group-id
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+  application:
+    name: Notification-Service
+
+  mail:
+    host: smtp.mail.ru  # SMTP сервер
+    port: 465              # Порт SMTP сервера
+    username: asimbek06@mail.ru
+    password: DnL00SdEdm3kZYKLptzr            # Пароль для SMTP
+    properties:
+      mail:
+        transport:
+          protocol: smtp
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+          starttls:
+            enable: false
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:9283/eureka

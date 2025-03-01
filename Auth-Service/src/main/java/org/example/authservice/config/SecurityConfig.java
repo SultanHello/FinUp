@@ -26,7 +26,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http){
         try {
             return http.csrf(AbstractHttpConfigurer::disable)
-                    .authorizeHttpRequests(auth->auth.requestMatchers("/auth/registration","/users/login","/auth/getUsername").permitAll()
+                    .authorizeHttpRequests(auth->auth.requestMatchers("/auth/registration","/auth/login","/auth/username/**").permitAll()
                             .anyRequest().authenticated())
                     .userDetailsService(myUserDetailsService)
                     .sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
