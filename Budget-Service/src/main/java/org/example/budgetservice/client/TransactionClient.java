@@ -11,7 +11,7 @@ import java.util.Map;
 
 @Service
 public class TransactionClient {
-    public Map<String,Double> getReport(Long id){
+    public Map<String,Double> getReportWeekly(Long id){
         RestTemplate restTemplate = new RestTemplate();
         org.springframework.http.HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -19,7 +19,23 @@ public class TransactionClient {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         Map<String,Double> response = restTemplate.exchange(
-                "http://transaction-service:1111/transactions/weekReport/"+id,
+                "http://transaction-service:1111/transactions/reportWeekly/"+id,
+                HttpMethod.GET,
+                entity,
+                new ParameterizedTypeReference<Map<String,Double>>() {}
+        ).getBody();
+        return response;
+    }
+
+    public Map<String,Double> getReportDaily(Long id){
+        RestTemplate restTemplate = new RestTemplate();
+        org.springframework.http.HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        //headers.set("Authorization", token);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        Map<String,Double> response = restTemplate.exchange(
+                "http://transaction-service:1111/transactions/reportDaily/"+id,
                 HttpMethod.GET,
                 entity,
                 new ParameterizedTypeReference<Map<String,Double>>() {}

@@ -15,7 +15,7 @@ import java.util.List;
 @Service
 
 public class BudgetClient {
-    public List<ReportDTO> getReports(Long id){
+    public List<ReportDTO> getReportsWeekly(Long id){
         RestTemplate restTemplate = new RestTemplate();
         org.springframework.http.HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -23,7 +23,7 @@ public class BudgetClient {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         List<ReportDTO> response = restTemplate.exchange(
-                "http://budget-service:3333/api/budget/report/user/"+id,
+                "http://budget-service:3333/api/budget/report/weekly/user/"+id,
                 HttpMethod.GET,
                 entity,
                 new ParameterizedTypeReference<List<ReportDTO>>() {}
@@ -31,7 +31,7 @@ public class BudgetClient {
         return response;
     }
 
-    public ReportDTO getReportLast(Long id){
+    public ReportDTO getReportWeeklyLast(Long id){
         RestTemplate restTemplate = new RestTemplate();
         org.springframework.http.HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -39,7 +39,40 @@ public class BudgetClient {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         ReportDTO response = restTemplate.exchange(
-                "http://budget-service:3333/api/budget/report/last/user/"+id,
+                "http://budget-service:3333/api/budget/report/weekly/last/user/"+id,
+                HttpMethod.GET,
+                entity,
+                new ParameterizedTypeReference<ReportDTO>() {}
+        ).getBody();
+        System.out.println("ressss :::::" +response);
+        return response;
+    }
+
+    public List<ReportDTO> getReportsDaily(Long id){
+        RestTemplate restTemplate = new RestTemplate();
+        org.springframework.http.HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        //headers.set("Authorization", token);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        List<ReportDTO> response = restTemplate.exchange(
+                "http://budget-service:3333/api/budget/report/daily/user/"+id,
+                HttpMethod.GET,
+                entity,
+                new ParameterizedTypeReference<List<ReportDTO>>() {}
+        ).getBody();
+        return response;
+    }
+
+    public ReportDTO getReportDailyLast(Long id){
+        RestTemplate restTemplate = new RestTemplate();
+        org.springframework.http.HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        //headers.set("Authorization", token);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        ReportDTO response = restTemplate.exchange(
+                "http://budget-service:3333/api/budget/report/daily/last/user/"+id,
                 HttpMethod.GET,
                 entity,
                 new ParameterizedTypeReference<ReportDTO>() {}

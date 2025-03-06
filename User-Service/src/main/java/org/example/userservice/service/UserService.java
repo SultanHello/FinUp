@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserServiceInterface {
     private final UserRepository userRepository ;
 
     private final AuthClient authClient;
@@ -47,13 +47,13 @@ public class UserService {
                 .build();
         userRepository.save(user);
     }
-
+    @Override
     public User getUserProfile(String token) {
         String username = authClient.getUsernameFromAuthService(token);
         System.out.println("dvsdvsdv :"+username);
         return userRepository.findByUsername(username);
     }
-    private Long getUserId(String token){
+    public Long getUserId(String token){
         String username = authClient.getUsernameFromAuthService(token);
         User user = userRepository.findByUsername(username);
         return user.getId();
@@ -61,7 +61,7 @@ public class UserService {
 
     }
 
-
+    @Override
     public String updateUserProfile(String token, User user) {
         String username = authClient.getUsernameFromAuthService(token);
         User userOld = userRepository.findByUsername(username);
@@ -76,66 +76,40 @@ public class UserService {
 
     }
 
+    @Override
+    public User getUserProfileById(Long id) {
+        return null;
+    }
 
+    @Override
     public List<User> getUsers() {
         return userRepository.findAll();
     }
 
-    public String setSpend(String authHeader, TransactionDTO transactionDTO) {
-        String token = getToken(authHeader);
-        System.out.println(123423);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedDate = LocalDateTime.now().format(formatter);
 
-        User user = userRepository.findByUsername(authClient.getUsernameFromAuthService(token));
-        Map<String, String> transaction = Map.of(
-                "amount", String.valueOf(transactionDTO.getAmount()),
-                "description", transactionDTO.getDescription(),
-                "date", formattedDate,
-                "userId", String.valueOf(user.getId())
-        );
-        System.out.println(321);
-        kafkaTemplate1.send("transaction", transaction);
-        return "succes";
 
-    }
 
-    private String getToken(String authHeader){
+
+    public String getToken(String authHeader){
         return authHeader.replace("Bearer ", "");
 
     }
-
+    @Override
     public List<Long> getIds() {
         return userRepository.findAll().stream()
                 .map(User::getId)
                 .collect(Collectors.toList());
     }
-
-    public List<ReportDTO> getReport(String token) {
-        Long userId = getUserId(token);
-        return budgetClient.getReports(userId);
+    @Override
+    public String deactivateUser(String username) {
+        return null;
 
     }
 
-    public ReportDTO getReportLast(String token) {
-        Long userId = getUserId(token);
-
-        return budgetClient.getReportLast(userId);
-    }
-
-    public User getUserProfileById(Long id) {
+    @Override
+    public String changePassword(String username, String newPassword) {
         return null;
     }
 
 
-//    public String deactivateUser(String username) {
-//
-//    }
-//
-//    public String changePassword(String username, String newPassword) {
-//    }
-//
-//    public String confirmEmail(String username) {
-
-//    }
 }

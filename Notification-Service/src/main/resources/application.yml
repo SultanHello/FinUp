@@ -4,9 +4,12 @@ spring:
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      group-id: my-group6  # Указан ваш group-id
+      group-id: my-group6
       auto-offset-reset: earliest
       enable-auto-commit: false
+      properties:
+        spring.json.use.type.headers: false  # Игнорируем заголовки типа (если они вдруг есть)
+        spring.json.value.default.type: org.example.notificationservice.dto.NotificationResponse
   application:
     name: Notification-Service
 

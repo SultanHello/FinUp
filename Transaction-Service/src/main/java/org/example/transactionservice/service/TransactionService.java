@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -112,5 +113,19 @@ public class TransactionService {
                 .map(Transaction::getUserId) // Получаем только transactionId
                 .collect(Collectors.toList());
         return transactionIds;
+    }
+
+    public Map<String, Double> generateDailyReport(Long userId) {
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(1);
+        List<Transaction> transactions = transactionRepository.findTransactionsByUserIdAndDateRange(
+                userId, startDate, endDate);
+        Map<String, Double> report = transactions.stream()
+                .collect(Collectors.groupingBy(
+                        Transaction::getDescription,
+                        Collectors.summingDouble(Transaction::getAmount)
+                ));
+        System.out.println(report);
+        return report;
     }
 }
