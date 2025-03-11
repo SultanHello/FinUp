@@ -33,7 +33,7 @@ public class TransactionController {
         return transactionService.getUserTransactions(id);
     }
     @GetMapping("/reportWeekly/{id}")
-    public Map<String,Double>reportWeekly(@PathVariable Long id){
+    public Map<String,Double> reportWeekly(@PathVariable Long id){
         return transactionService.generateWeeklyReport(id);
     }
     @GetMapping("/reportDaily/{id}")

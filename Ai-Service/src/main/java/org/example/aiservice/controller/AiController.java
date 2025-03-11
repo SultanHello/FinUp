@@ -23,7 +23,7 @@ public class AiController {
         return aiService.connectAiCategory(text);
     }
 
-    @PostMapping("/advaice")
+    @PostMapping("/advice")
     public String DoAdvice(@RequestParam String text){
         return aiService.connectAiAdvice(text);
     }

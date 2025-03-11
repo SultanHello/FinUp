@@ -87,8 +87,6 @@ public class TransactionService {
         // Получаем текущую дату и дату начала недели
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusDays(7);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
         // Извлекаем транзакции из репозитория
         List<Transaction> transactions = transactionRepository.findTransactionsByUserIdAndDateRange(
                 userId, startDate, endDate);
@@ -114,7 +112,6 @@ public class TransactionService {
                 .collect(Collectors.toList());
         return transactionIds;
     }
-
     public Map<String, Double> generateDailyReport(Long userId) {
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusDays(1);

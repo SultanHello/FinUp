@@ -14,6 +14,7 @@ public class ReportDTO {
 
 
     private Map<String,Double> info;
+    private String advice;
 
     private LocalDate reportDate;
 

@@ -12,17 +12,15 @@ import java.util.List;
 @Entity
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "TextContents")
+@AllArgsConstructor
+@Table(name = "contentTests")
 public class ContentText {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false,columnDefinition = "TEXT")
+    @Column(length = 10000)
     private String text;
-
-
+    private String role; // Новое поле: "user" или "assistant"
+    private String type;
 }

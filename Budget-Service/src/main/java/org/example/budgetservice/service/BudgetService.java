@@ -20,9 +20,6 @@ public class BudgetService {
     private final ReportService<ReportWeekly> reportWeeklyReportService;
     private final ReportService<ReportDaily> reportDailyReportService;
 
-    private final ReportWeeklyRepository reportWeeklyRepository;
-    private final ReportDailyRepository reportDailyRepository;
-    private final NotificationSender notificationSender;
 
 
     public ReportWeekly getReportWeeklyByReportId(Long id) {
@@ -34,7 +31,6 @@ public class BudgetService {
     }
 
     public void saveReportWeekly(Map<String,Double> reportInfo,Long id){
-
         reportWeeklyReportService.saveReport(reportInfo,id);
     }
 
@@ -50,6 +46,8 @@ public class BudgetService {
     public void saveReportDaily(Map<String,Double> reportInfo, Long id) {
         reportDailyReportService.saveReport(reportInfo,id);
     }
+
+
 
     public List<ReportDaily> getReportDailyByUserId(Long userId) {
         return reportDailyReportService.getReportByUserId(userId);

@@ -5,6 +5,7 @@ import org.example.budgetservice.client.TransactionClient;
 import org.example.budgetservice.client.UserClient;
 
 import org.example.budgetservice.service.BudgetService;
+import org.example.budgetservice.service.ReportWeeklyService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -13,33 +14,28 @@ import java.util.Map;
 
 @Service
 @AllArgsConstructor
-public class ReportWeeklyGenerator {
+public class ReportWeeklyGenerator implements ReportGenerator{
 
     private final BudgetService budgetService;
-    private final UserClient userClient;
     private final TransactionClient transactionClient;
+    private final ReportWeeklyService reportWeeklyService;
 
     // Запуск каждое воскресенье в полночь
-    @Scheduled(cron = "0 */2 * * * *")
-    public void generateWeeklyReport() {
+    @Scheduled(cron = "0 0 1 * * SUN")
+    public void generateReport() {
         addReport();
         // Логика генерации отчета
         System.out.println("Генерация еженедельного отчета...");
         // Здесь можешь собирать данные и отправлять их на email или сохранять в базу
     }
-    public List<Long> getIds(){
-        return userClient.userIds();
-    }
     public Map<String,Double> weeklyReport(Long id){
         return transactionClient.getReportWeekly(id);
     }
     public void addReport() {
-        List<Long> ids= getIds();
+        List<Long> ids = reportWeeklyService.getAllUserIds();
         for (Long id : ids) {
+            reportWeeklyService.saveReportForUser(id);
             budgetService.saveReportWeekly(weeklyReport(id),id);
         }
     }
-
-
-
 }

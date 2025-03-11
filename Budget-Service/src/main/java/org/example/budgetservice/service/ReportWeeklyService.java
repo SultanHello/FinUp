@@ -1,7 +1,10 @@
 package org.example.budgetservice.service;
 
 import lombok.AllArgsConstructor;
+import org.example.budgetservice.client.TransactionClient;
+import org.example.budgetservice.client.UserClient;
 import org.example.budgetservice.factory.ReportFactory;
+import org.example.budgetservice.generator.ReportWeeklyGenerator;
 import org.example.budgetservice.model.ReportDaily;
 import org.example.budgetservice.model.ReportWeekly;
 import org.example.budgetservice.notification.NotificationSender;
@@ -11,6 +14,7 @@ import org.example.budgetservice.repository.ReportWeeklyRepository;
 
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +25,8 @@ public class ReportWeeklyService implements ReportService<ReportWeekly> {
     private final ReportWeeklyRepository reportWeeklyRepository;
     private final ReportObserver reportObserver;
     private final ReportFactory reportFactory;
+    private final TransactionClient transactionClient;
+    private final UserClient userClient;
     @Override
     public List<ReportWeekly> getAllReports() {
         return reportWeeklyRepository.findAll();
@@ -54,5 +60,13 @@ public class ReportWeeklyService implements ReportService<ReportWeekly> {
     }
 
 
+    public List<Long> getAllUserIds() {
+        return userClient.userIds();
+    }
 
+    public void saveReportForUser(Long userId) {
+        Map<String,Double> reportData=transactionClient.getReportWeekly(userId);
+
+        saveReport(reportData, userId);
+    }
 }

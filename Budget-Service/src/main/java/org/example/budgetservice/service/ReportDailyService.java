@@ -1,6 +1,8 @@
 package org.example.budgetservice.service;
 
 import lombok.AllArgsConstructor;
+import org.example.budgetservice.client.TransactionClient;
+import org.example.budgetservice.client.UserClient;
 import org.example.budgetservice.factory.ReportFactory;
 import org.example.budgetservice.model.Report;
 import org.example.budgetservice.model.ReportDaily;
@@ -9,6 +11,8 @@ import org.example.budgetservice.repository.ReportDailyRepository;
 import org.example.budgetservice.repository.ReportWeeklyRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +23,8 @@ import java.util.Map;
 public class ReportDailyService implements ReportService<ReportDaily>{
     private final ReportDailyRepository reportDailyRepository;
     private final ReportFactory reportFactory;
+    private final UserClient userClient;
+    private final TransactionClient transactionClient;
     @Override
     public ReportDaily getReportByReportId(Long id) {
         return reportDailyRepository.findByReportId(id);
@@ -27,6 +33,7 @@ public class ReportDailyService implements ReportService<ReportDaily>{
     @Override
     public ReportDaily getLastReport(Long userId) {
         List<ReportDaily> reportDailies = reportDailyRepository.findByUserId(userId);
+
         if(reportDailies.isEmpty()){
             return null;
         }
@@ -49,5 +56,16 @@ public class ReportDailyService implements ReportService<ReportDaily>{
     @Override
     public List<ReportDaily> getAllReports() {
         return reportDailyRepository.findAll();
+    }
+
+
+
+    public List<Long> getAllUserIds() {
+        return userClient.userIds();
+    }
+
+    public void saveReportForUser(Long userId) {
+        Map<String, Double> reportData = transactionClient.getReportDaily(userId);
+        saveReport(reportData, userId);
     }
 }

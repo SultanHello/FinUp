@@ -2,10 +2,7 @@ package org.example.budgetservice.model;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,6 +14,7 @@ import java.util.Map;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+
 public class ReportWeekly implements Report{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,10 +22,12 @@ public class ReportWeekly implements Report{
 
     private Long userId;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "weekly_info_data", joinColumns = @JoinColumn(name = "report_id"))
     @MapKeyColumn(name = "metric")
     @Column(name = "value")
     private Map<String,Double> info;
+    @Column(length = 2000)
+    private String advice;
     private LocalDate reportDate;
 }
