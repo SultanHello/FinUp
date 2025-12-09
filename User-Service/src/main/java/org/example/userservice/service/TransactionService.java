@@ -1,6 +1,7 @@
 package org.example.userservice.service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.userservice.client.AuthClient;
 import org.example.userservice.dto.TransactionDTO;
 import org.example.userservice.model.User;
@@ -12,31 +13,55 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
+@Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TransactionService implements TransactionServiceInterface {
+
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     private final UserService userService;
     private final AuthClient authClient;
     private final UserRepository userRepository;
-    private final KafkaTemplate<String, Map<String,String>> kafkaTemplate1;
+    private final KafkaTemplate<String, Map<String, String>> kafkaTemplate;
 
     @Override
     public String createTransaction(String authHeader, TransactionDTO transactionDTO) {
-        String token = userService.getToken(authHeader);
-        System.out.println(123423);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedDate = LocalDateTime.now().format(formatter);
+        if (transactionDTO == null) {
+            throw new IllegalArgumentException("Transaction data cannot be null");
+        }
 
-        User user = userRepository.findByUsername(authClient.getUsernameFromAuthService(token));
-        Map<String, String> transaction = Map.of(
-                "amount", String.valueOf(transactionDTO.getAmount()),
-                "description", transactionDTO.getDescription(),
-                "date", formattedDate,
-                "userId", String.valueOf(user.getId())
-        );
-        System.out.println(321);
-        kafkaTemplate1.send("transaction", transaction);
-        return "succes";
+
+        if (transactionDTO.getDescription() == null || transactionDTO.getDescription().trim().isEmpty()) {
+            throw new IllegalArgumentException("Description cannot be empty");
+        }
+
+        try {
+            String token = userService.extractToken(authHeader);
+            String username = authClient.getUsernameFromAuthService(token);
+
+            User user = userRepository.findByUsername(username);
+            if (user == null) {
+                throw new IllegalArgumentException("User not found: " + username);
+            }
+
+            String formattedDate = LocalDateTime.now().format(FORMATTER);
+
+            Map<String, String> transaction = Map.of(
+                    "amount", String.valueOf(transactionDTO.getAmount()),
+                    "description", transactionDTO.getDescription().trim(),
+                    "date", formattedDate,
+                    "userId", String.valueOf(user.getId())
+            );
+
+            kafkaTemplate.send("transaction", transaction);
+            log.info("Transaction sent to Kafka for user: {}, amount: {}", username, transactionDTO.getAmount());
+
+            return "Transaction created successfully";
+
+        } catch (Exception e) {
+            log.error("Failed to create transaction", e);
+            throw new RuntimeException("Failed to create transaction", e);
+        }
     }
-
 }

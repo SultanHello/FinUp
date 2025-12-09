@@ -41,11 +41,11 @@ public class TransactionController {
         return transactionService.generateDailyReport(id);
     }
 
-//    @GetMapping("/cotegory/{id}")
+    //    @GetMapping("/cotegory/{id}")
 //    public
     @GetMapping("/ids")
     public List<Long> getIds(){
-        return transactionService.getIds();
+        return transactionService.getUserIds();
     }
 
 

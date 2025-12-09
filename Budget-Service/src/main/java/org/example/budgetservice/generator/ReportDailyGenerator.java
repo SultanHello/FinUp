@@ -1,51 +1,60 @@
+
 package org.example.budgetservice.generator;
 
-import lombok.AllArgsConstructor;
-import org.example.budgetservice.client.TransactionClient;
-import org.example.budgetservice.client.UserClient;
-
-import org.example.budgetservice.repository.ReportWeeklyRepository;
-import org.example.budgetservice.service.BudgetService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.budgetservice.service.ReportDailyService;
-import org.example.budgetservice.service.ReportService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
+@Slf4j
 @Service
-@AllArgsConstructor
-public class ReportDailyGenerator implements ReportGenerator{
+@RequiredArgsConstructor
+public class ReportDailyGenerator implements ReportGenerator {
 
-    private final BudgetService budgetService;
-    private final ReportWeeklyRepository reportWeeklyRepository;
-    private final UserClient userClient;
     private final ReportDailyService reportDailyService;
-    private final TransactionClient transactionClient;
 
-    // Запуск каждое воскресенье в полночь
+    /**
+     * Генерация ежедневного отчета каждый день в 00:05
+     */
     @Scheduled(cron = "0 5 0 * * *")
+    @Override
     public void generateReport() {
-        addReport();
-        // Логика генерации отчета
-        System.out.println("Генерация еженедневного отчета...");
-        // Здесь можешь собирать данные и отправлять их на email или сохранять в базу
-    }
+        log.info("Starting daily report generation...");
 
-    public void addReport() {
-        System.out.println("00000000000...");
-
-        List<Long> ids = reportDailyService.getAllUserIds();  // Сервис получает пользователей
-
-        for (Long id : ids) {
-            System.out.println("11111111111..."+id);
-            reportDailyService.saveReportForUser(id);
-
-
+        try {
+            addReport();
+            log.info("Daily report generation completed successfully");
+        } catch (Exception e) {
+            log.error("Daily report generation failed", e);
         }
     }
 
+    public void addReport() {
+        List<Long> userIds = reportDailyService.getAllUserIds();
 
+        if (userIds.isEmpty()) {
+            log.warn("No users found for daily report generation");
+            return;
+        }
 
+        log.info("Generating daily reports for {} users", userIds.size());
+
+        int successCount = 0;
+        int failCount = 0;
+
+        for (Long userId : userIds) {
+            try {
+                reportDailyService.saveReportForUser(userId);
+                successCount++;
+            } catch (Exception e) {
+                log.error("Failed to generate daily report for user: {}", userId, e);
+                failCount++;
+            }
+        }
+
+        log.info("Daily report generation finished. Success: {}, Failed: {}", successCount, failCount);
+    }
 }

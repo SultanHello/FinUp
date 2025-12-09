@@ -17,12 +17,14 @@ public class GeminiClient {
 
         HttpEntity<AiConnection> entity = new HttpEntity<>(aiConnection, headers);
 
+
         ResponseEntity<AiResponse> response = restTemplate.exchange(
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey,
+                "https://generativelanguage.googleapis.com/v1beta/models/text-bison-001:generateContent?key=" + apiKey,
                 HttpMethod.POST,
                 entity,
                 AiResponse.class
         );
+
         return response;
 
     }

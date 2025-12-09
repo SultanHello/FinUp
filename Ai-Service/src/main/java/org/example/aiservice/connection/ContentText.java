@@ -21,6 +21,6 @@ public class ContentText {
     private Long id;
     @Column(length = 10000)
     private String text;
-    private String role; // Новое поле: "user" или "assistant"
+    private String role;
     private String type;
 }

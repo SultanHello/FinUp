@@ -40,7 +40,6 @@ public class AiService {
 
         // Загружаем предыдущий контекст
         if (previousContents.isEmpty()) {
-            // Если контекста нет, добавляем промпт как "user"
             contentTextRepository.save(ContentText.builder()
                     .text(prompt)
                     .role("user")
